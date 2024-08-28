@@ -1,8 +1,9 @@
 import Button from "../components/Button/Button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useRouteError } from "react-router-dom";
 
 const ErrorPage = () => {
   const navigate = useNavigate();
+  const routerError = useRouteError()
 
   return (
     <section className="bg-white ">
@@ -25,7 +26,8 @@ const ErrorPage = () => {
             </svg>
           </p>
           <h1 className="mt-3 text-2xl font-semibold text-gray-800  md:text-3xl">
-            Something Went Wrong!
+            {/* Something Went Wrong! */}
+            {routerError.statusText || routerError.message}
           </h1>
           <p className="mt-4 text-gray-500 ">Here are some helpful links:</p>
 

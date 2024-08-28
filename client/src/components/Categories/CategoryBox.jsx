@@ -1,25 +1,25 @@
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import qs from 'query-string'
+import { useNavigate, useSearchParams } from "react-router-dom";
+import qs from "query-string";
 /* eslint-disable react/prop-types */
 const CategoryBox = ({ label, icon: Icon, selected }) => {
-  console.log(selected)
-  const [params, setParams] = useSearchParams()
-  const navigate = useNavigate()
+  // console.log(selected)
+  const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
   const handleClick = () => {
-    let currentQuery = {}
+    let currentQuery = {};
     if (params) {
-      currentQuery = qs.parse(params.toString())
+      currentQuery = qs.parse(params.toString());
     }
-    const updatedQuery = { ...currentQuery, category: label }
+    const updatedQuery = { ...currentQuery, category: label };
 
     const url = qs.stringifyUrl({
-      url: '/',
+      url: "/",
       query: updatedQuery,
-    })
+    });
 
-    navigate(url)
-  }
-  params.get('category')
+    navigate(url);
+  };
+  params.get("category");
   return (
     <div
       onClick={handleClick}
@@ -32,12 +32,12 @@ const CategoryBox = ({ label, icon: Icon, selected }) => {
   border-b-2
   hover:text-neutral-800
   transition
-  cursor-pointer ${selected ? 'border-b-neutral-800 text-neutral-800' : ''}`}
+  cursor-pointer ${selected ? "border-b-neutral-800 text-neutral-800" : ""}`}
     >
       <Icon size={26} />
-      <div className='text-sm font-medium'> {label}</div>
+      <div className="text-sm font-medium"> {label}</div>
     </div>
-  )
-}
+  );
+};
 
-export default CategoryBox
+export default CategoryBox;
