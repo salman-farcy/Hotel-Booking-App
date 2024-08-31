@@ -7,32 +7,25 @@ import Loader from '../Shared/Loader'
 
 const Rooms = () => {
   const [rooms, setRooms] = useState([])
-  const [params, setParams] = useSearchParams()
   const [loading, setLoading] = useState(false)
+  const [params, setParams] = useSearchParams()
   const category = params.get('category')
+  
 
-//   useEffect(() => {
-//     setLoading(true)
-//     fetch('./rooms.json')
-//       .then(res => res.json())
-//       .then(data => {
-//         if (category) {
-//           const filtered = data.filter(room => room.category === category)
-//           setRooms(filtered)
-//         } else setRooms(data)
-// 
-//         setLoading(false)
-//       })
-//   }, [category])
+  useEffect(() => {
+    setLoading(true)
+    fetch('./rooms.json')
+      .then(res => res.json())
+      .then(data => {
+        if (category) {
+          const filtered = data.filter(room => room.category === category)
+          setRooms(filtered)
+        } else setRooms(data)
 
+        setLoading(false)
+      })
+  }, [category])
 
-  useEffect(( )=> {
-    fetch("../../../public/rooms.json")
-    .then(res => res.json())
-    .then(data => {
-      setRooms(data)
-    })
-  }, [])
 
 
   if (loading) return <Loader />
@@ -45,7 +38,7 @@ const Rooms = () => {
           ))}
         </div>
       ) : (
-        <div className='flex items-center justify-center min-h-[calc(100vh-300px)]'>
+        <div className=' flex items-center justify-center min-h-[calc(100vh-300px)]'>
           <Heading
             center={true}
             title='No Rooms Available In This Category!'
