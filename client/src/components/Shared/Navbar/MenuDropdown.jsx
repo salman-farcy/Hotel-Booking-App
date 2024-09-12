@@ -6,7 +6,7 @@ import avatarImg from "../../../assets/images/placeholder.jpg";
 
 const MenuDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, logOut } = useAuth();
 
   return (
     <div className="relative">
@@ -59,6 +59,10 @@ const MenuDropdown = () => {
             >
               Sign Up
             </Link>
+            
+          </div>
+          <div  className="bg-red-400 text-center py-3 text-white font-semibold cursor-pointer">
+            <button onClick={() => logOut()}>LogOut</button>
           </div>
         </div>
       )}
