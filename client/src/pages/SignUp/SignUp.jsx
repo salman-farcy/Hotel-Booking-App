@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
 import { FcGoogle } from 'react-icons/fc'
-import axios from "axios"
+import { imgUploadImgbb } from '../../api/utils'
+import useAuth from '../../hooks/useAuth'
 
 const SignUp = () => {
 
-  // Use uncontrole from handle
+
+  // TODO: Use uncontrole from handle
   const handelSubmite = async (e) => {
     //? 00 from defult reload stop
     e.preventDefault()
@@ -14,17 +16,7 @@ const SignUp = () => {
     const image = form.image.files[0]
     
     //? 02 Process of uploading images to imgBB 
-      //! imgBB has to send image in FormData format so we put image in FormData
-    const fromData = new FormData()
-    fromData.append('image', image)
-
-    //! Uploaded images to imgBB using axios
-    try{
-      const { data } = await axios.post(`https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`, fromData)
-    }catch(err){
-      console.log(err)
-    }
-    
+    const imageData = await imgUploadImgbb(image)
   }
 
   return (
