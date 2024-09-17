@@ -30,7 +30,7 @@ const SignUp = () => {
       await updateUserProfile(name, imageData?.data?.display_url)
 
       //? 05 Save user data in database
-
+      
       //? 06 get token
 
 

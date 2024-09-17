@@ -1,10 +1,10 @@
 import { differenceInDays } from "date-fns";
-import Button from "../../components/Button/Button";
+import Button from "../Button/Button";
 import Calender from "./Calender";
 
 const RoomReservation = ({ room }) => {
   const totalDay = differenceInDays(new Date(room?.to), new Date(room?.from));
-  
+
   const totalPrice = totalDay * room?.price;
   return (
     <div className="rounded-xl border-[1px] border-neutral-200 overflow-hidden bg-white">

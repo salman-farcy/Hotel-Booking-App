@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import Container from "../../components/Shared/Container";
+import Container from "../Shared/Container";
 import { useParams } from "react-router-dom";
-import Loader from "../../components/Shared/Loader";
+import Loader from "../Shared/Loader";
 import { Helmet } from "react-helmet-async";
 import Header from "./Header";
 import RoomInfo from "./RoomInfo";
 import RoomReservation from "./RoomReservation";
-
 
 const RoomDetails = () => {
   const { id } = useParams();
@@ -37,10 +36,10 @@ const RoomDetails = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-7 md:gap-10 mt-6">
           <RoomInfo room={room} />
-          
+
           {/* Calender/ RoomReservation */}
           <div className="col-span-3 order-first md:order-last">
-            <RoomReservation room={room}/>
+            <RoomReservation room={room} />
           </div>
         </div>
       </div>
