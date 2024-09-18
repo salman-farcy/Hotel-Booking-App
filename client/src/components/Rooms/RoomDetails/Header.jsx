@@ -1,4 +1,4 @@
-import Heading from "../Shared/Heading";
+import Heading from "../../Shared/Heading";
 
 const Header = ({ room }) => {
   return (

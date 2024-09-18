@@ -1,29 +1,27 @@
-import { useEffect, useState } from "react";
-import Container from "../Shared/Container";
+import Container from "../../Shared/Container";
 import { useParams } from "react-router-dom";
-import Loader from "../Shared/Loader";
+import Loader from "../../Shared/Loader";
 import { Helmet } from "react-helmet-async";
 import Header from "./Header";
 import RoomInfo from "./RoomInfo";
 import RoomReservation from "./RoomReservation";
+import { useQuery } from "@tanstack/react-query";
+import useAxiosCommon from "../../../hooks/useAxiosCommon";
 
 const RoomDetails = () => {
   const { id } = useParams();
-  const [room, setRoom] = useState({});
-  const [loading, setLoading] = useState(false);
+  const axiosCommon = useAxiosCommon();
 
-  useEffect(() => {
-    setLoading(true);
-    fetch("/rooms.json")
-      .then((res) => res.json())
-      .then((data) => {
-        const singleRoom = data.find((room) => room._id === id);
-        setRoom(singleRoom);
-        setLoading(false);
-      });
-  }, [id]);
+  const { data: room = {}, isLoading } = useQuery({
+    queryKey: ["room", id],
+    queryFn: async () => {
+      const { data } = await axiosCommon.get(`/room/${id}`);
+      return data;
+    },
+  });
 
-  if (loading) return <Loader />;
+  if (isLoading) return <Loader />;
+
   return (
     <Container>
       <Helmet>

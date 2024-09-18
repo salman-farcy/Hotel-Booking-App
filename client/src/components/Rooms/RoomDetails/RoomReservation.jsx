@@ -1,5 +1,5 @@
 import { differenceInDays } from "date-fns";
-import Button from "../Button/Button";
+import Button from "../../Button/Button";
 import Calender from "./Calender";
 
 const RoomReservation = ({ room }) => {
