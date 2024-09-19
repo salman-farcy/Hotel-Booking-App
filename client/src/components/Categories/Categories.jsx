@@ -17,6 +17,7 @@ const Categories = () => {
             icon={item.icon}
             selected={category === item.label}
           />
+          
         ))}
       </div>
     </Container>

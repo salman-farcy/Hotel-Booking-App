@@ -1,25 +1,18 @@
-import { useNavigate, useSearchParams } from "react-router-dom";
-import qs from "query-string";
+import { useNavigate } from "react-router-dom";
+import queryString from "query-string";
 /* eslint-disable react/prop-types */
 const CategoryBox = ({ label, icon: Icon, selected }) => {
-  const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
+  console.log(selected)
 
   const handleClick = () => {
-    let instanQuary = {};
-    if(params){
-      instanQuary = qs.parse(params.toString());
-    }
-    
-    const updatedQuery = { ...instanQuary, category: label };
-    const url = qs.stringifyUrl({
-      url: "/",
-      query: updatedQuery,
+    let currentQuery = {category: label}
+    const url = queryString.stringifyUrl({
+      url: '/',
+      query: currentQuery
     })
-    navigate(url);
+    navigate(url)
   }
-    
-  params.get("category");
 
   return (
     <div

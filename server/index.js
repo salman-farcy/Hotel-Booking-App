@@ -3,7 +3,7 @@ const app = express()
 require('dotenv').config()
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-const { MongoClient, ServerApiVersion } = require('mongodb')
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const jwt = require('jsonwebtoken')
 const morgan = require('morgan')
 const port = process.env.PORT || 8000
@@ -44,6 +44,9 @@ const client = new MongoClient(process.env.DB_URI, {
 })
 async function run() {
   try {
+    const roomsCollection = client.db('HotelBookingApp').collection('rooms')
+
+
     // auth related api
     app.post('/jwt', async (req, res) => {
       const user = req.body
@@ -75,6 +78,24 @@ async function run() {
         res.status(500).send(err)
       }
     })
+
+    // Get all Room
+    app.get("/rooms", async (req, res) => {
+      const category = req.query.category
+      let query = {}
+      if(category && category !== "null") query = {category}
+      const result = await roomsCollection.find(query).toArray()
+      res.send(result)
+    })
+
+    // get a single room data from db using _ID
+    app.get("/room/:roomId", async (req, res) => {
+      const id = req.params.roomId
+      const query = {_id: new ObjectId(id)}
+      const result = await roomsCollection.findOne(query)
+      res.send(result)
+    })
+
 
     // Save or modify user email, status in DB
       app.put('/users/:email', async (req, res) => {
