@@ -39,7 +39,7 @@ const SignUp = () => {
 
       //? 06 get token
     } catch (err) {
-      toast.error(err)
+      toast.error(err, {id: tostId})
     }
   };
 
@@ -47,7 +47,6 @@ const SignUp = () => {
   const handelUseGoogle = async () => {
     const tostId = toast.loading("SignUp...")
     try {
-      setLoading(true)
       await signInWithGoogle()
       navigate('/')
       toast.success('Successfully SingUp', {id: tostId})
@@ -55,7 +54,7 @@ const SignUp = () => {
 
       //? 06 get token
     } catch (err) {
-      toast.error(err.message)
+      toast.error(err.message, {id: tostId})
     }
   }
 
