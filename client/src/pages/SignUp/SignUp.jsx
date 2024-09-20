@@ -1,11 +1,13 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { imgUploadImgbb } from "../../api/utils";
 import useAuth from "../../hooks/useAuth";
+import { TbFidgetSpinner } from "react-icons/tb";
+import toast from "react-hot-toast";
 
 const SignUp = () => {
-  const { createUser, updateUserProfile, signInWithGoogle } = useAuth();
-
+  const { createUser, updateUserProfile, signInWithGoogle, setLoading, loading } = useAuth();
+  const navigate = useNavigate()
   // TODO: Use uncontrole from handle
   const handelSubmite = async (e) => {
     //? 00 from defult reload stop
@@ -18,32 +20,44 @@ const SignUp = () => {
     const password = form.password.value;
     const image = form.image.files[0];
 
+    const tostId = toast.loading("SignUp...")
+
     try {
+      setLoading(true)
       //? 02 Process of uploading images to imgBB
       const imageData = await imgUploadImgbb(image);
 
       //? 03 Process of creating user in firebase
       const result = await createUser(email, password);
-      console.log(result)
+      console.log(result);
 
       //? 04 set user name and profile
-      await updateUserProfile(name, imageData?.data?.display_url)
-
+      await updateUserProfile(name, imageData?.data?.display_url);
+      navigate('/')
+      toast.success('Successfully SingUp', {id: tostId})
       //? 05 Save user data in database
-      
+
       //? 06 get token
-
-
     } catch (err) {
-      console.log(err);
+      toast.error(err)
     }
-
   };
 
   //* signUp use Google
-  // const handelUseGoogle = () => {
-  //   signInWithGoogle()
-  // }
+  const handelUseGoogle = async () => {
+    const tostId = toast.loading("SignUp...")
+    try {
+      setLoading(true)
+      await signInWithGoogle()
+      navigate('/')
+      toast.success('Successfully SingUp', {id: tostId})
+      //? 05 Save user data in database
+
+      //? 06 get token
+    } catch (err) {
+      toast.error(err.message)
+    }
+  }
 
   return (
     <div className="flex justify-center items-center min-h-screen">
@@ -122,7 +136,7 @@ const SignUp = () => {
               type="submit"
               className="bg-rose-500 w-full rounded-md py-3 text-white"
             >
-              Continue
+             {loading ? <TbFidgetSpinner className="animate-spin m-auto"/> : 'Continue'}
             </button>
           </div>
         </form>
@@ -133,11 +147,10 @@ const SignUp = () => {
           </p>
           <div className="flex-1 h-px sm:w-16 dark:bg-gray-700"></div>
         </div>
-        <div  className="flex justify-center items-center space-x-2 border m-3 p-2 border-gray-300 border-rounded cursor-pointer">
+        <button disabled={loading} onClick={handelUseGoogle} className="flex justify-center items-center space-x-2 border m-3 p-2 border-gray-300 border-rounded disabled:cursor-not-allowed cursor-pointer">
           <FcGoogle size={32} />
-
           <p>Continue with Google</p>
-        </div>
+        </button>
         <p className="px-6 text-sm text-center text-gray-400">
           Already have an account?{" "}
           <Link

@@ -3,7 +3,6 @@ import queryString from "query-string";
 /* eslint-disable react/prop-types */
 const CategoryBox = ({ label, icon: Icon, selected }) => {
   const navigate = useNavigate();
-  console.log(selected)
 
   const handleClick = () => {
     let currentQuery = {category: label}
