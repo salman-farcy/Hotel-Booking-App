@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { imgUploadImgbb } from "../../api/utils";
 import useAuth from "../../hooks/useAuth";
@@ -8,6 +8,8 @@ import toast from "react-hot-toast";
 const SignUp = () => {
   const { createUser, updateUserProfile, signInWithGoogle, setLoading, loading } = useAuth();
   const navigate = useNavigate()
+  const location = useLocation()
+  let from = location.state?.from?.pathname || "/";
   // TODO: Use uncontrole from handle
   const handelSubmite = async (e) => {
     //? 00 from defult reload stop
@@ -33,7 +35,7 @@ const SignUp = () => {
 
       //? 04 set user name and profile
       await updateUserProfile(name, imageData?.data?.display_url);
-      navigate('/')
+      navigate(from, { replace: true })
       toast.success('Successfully SingUp', {id: tostId})
       //? 05 Save user data in database
 
@@ -48,7 +50,7 @@ const SignUp = () => {
     const tostId = toast.loading("SignUp...")
     try {
       await signInWithGoogle()
-      navigate('/')
+      navigate(from, { replace: true })
       toast.success('Successfully SingUp', {id: tostId})
       //? 05 Save user data in database
 

@@ -1,4 +1,4 @@
-import { Link, useNavigate,  } from "react-router-dom";
+import { Link, useLocation, useNavigate,  } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
@@ -7,8 +7,10 @@ import { useState } from "react";
 
 const Login = () => {
   const { signIn, signInWithGoogle, loading, resetPassword, setLoading } = useAuth();
-  const navigate = useNavigate()
   const [email, setEmail] = useState('')
+  const navigate = useNavigate()
+  const location = useLocation()
+  let from = location.state?.from?.pathname || "/";
 
   
 
@@ -24,7 +26,7 @@ const Login = () => {
       setLoading(true)
       //? 02 Process of Login user in firebase
       await signIn(email, password);
-      navigate('/')
+      navigate(from, { replace: true })
       toast.success('Successfully SingUp', {id: tostId})
     }catch(err){
       toast.error(err.message, {id: tostId})
@@ -51,7 +53,7 @@ const Login = () => {
     try {
       setLoading(true)
       await signInWithGoogle()
-      navigate('/')
+      navigate(from, { replace: true })
       toast.success('Successfully SingUp', {id: tostId})
       //? 05 Save user data in database
 

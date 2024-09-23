@@ -1,8 +1,18 @@
 import { differenceInDays } from "date-fns";
 import Button from "../../Button/Button";
-import Calender from "./Calender";
+// import Calender from "./Calender";
+import { useState } from "react";
+import { DateRange } from "react-date-range";
+
 
 const RoomReservation = ({ room }) => {
+  const [state, setState] = useState([
+    {
+      startDate: new Date(),
+      endDate: new Date(),
+      key: "selection",
+    },
+  ]);
   const totalDay = differenceInDays(new Date(room?.to), new Date(room?.from));
 
   const totalPrice = totalDay * room?.price;
@@ -15,7 +25,15 @@ const RoomReservation = ({ room }) => {
       <hr />
 
       <div className="flex justify-center">
-        <Calender />
+        {/* <Calender /> */}
+        <DateRange
+          showDateDisplay={false}
+          rangeColors={["#F6536D"]}
+          editableDateInputs={true}
+          onChange={(item) => setState([item.selection])}
+          moveRangeOnFirstSelection={false}
+          ranges={state}
+        />
       </div>
 
       <hr />

@@ -38,32 +38,50 @@ const MenuDropdown = () => {
       </div>
       {isOpen && (
         <div className="absolute rounded-xl shadow-md w-[40vw] md:w-[10vw] bg-white overflow-hidden right-0 top-12 text-sm">
-          <div className="flex flex-col cursor-pointer">
-            <Link
-              to="/"
-              className="block md:hidden px-4 py-3 hover:bg-neutral-100 transition font-semibold"
-              onClick={() => setIsOpen(!isOpen)}
-            >
-              Home
-            </Link>
-
-            <Link
-              to="/login"
-              className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
-            >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
-            >
-              Sign Up
-            </Link>
-            
-          </div>
-          <div  className="bg-red-400 text-center py-3 text-white font-semibold cursor-pointer">
-            <button onClick={() => logOut()}>LogOut</button>
-          </div>
+          {/* <div className="flex flex-col cursor-pointer"> */}
+          {user ? (
+            <div className="flex flex-col cursor-pointer">
+              <Link
+                to="/"
+                className="block md:hidden px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                onClick={() => setIsOpen(!isOpen)}
+              >
+                Home
+              </Link>
+              <Link
+                to="/dashbord"
+                className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+              >
+                Dashbord
+              </Link>
+              <div className="bg-red-400 text-center py-3 text-white font-semibold cursor-pointer">
+                <button onClick={() => logOut()}>LogOut</button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col cursor-pointer">
+              <Link
+                to="/"
+                className="block md:hidden px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+                onClick={() => setIsOpen(!isOpen)}
+              >
+                Home
+              </Link>
+              <Link
+                to="/login"
+                className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+              >
+                Login
+              </Link>
+              <Link
+                to="/signup"
+                className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
+              >
+                Sign Up
+              </Link>
+            </div>
+          )}
+          {/* </div> */}
         </div>
       )}
     </div>
