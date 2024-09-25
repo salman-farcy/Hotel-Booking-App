@@ -37,11 +37,13 @@ const SignUp = () => {
       await updateUserProfile(name, imageData?.data?.display_url);
       navigate(from, { replace: true })
       toast.success('Successfully SingUp', {id: tostId})
+      setLoading(false)
       //? 05 Save user data in database
 
       //? 06 get token
     } catch (err) {
       toast.error(err, {id: tostId})
+      setLoading(false)
     }
   };
 
@@ -49,14 +51,17 @@ const SignUp = () => {
   const handelUseGoogle = async () => {
     const tostId = toast.loading("SignUp...")
     try {
+      setLoading(true)
       await signInWithGoogle()
       navigate(from, { replace: true })
       toast.success('Successfully SingUp', {id: tostId})
+      setLoading(false)
       //? 05 Save user data in database
 
       //? 06 get token
     } catch (err) {
       toast.error(err.message, {id: tostId})
+      setLoading(false)
     }
   }
 

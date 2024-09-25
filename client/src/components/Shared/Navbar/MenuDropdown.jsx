@@ -38,7 +38,6 @@ const MenuDropdown = () => {
       </div>
       {isOpen && (
         <div className="absolute rounded-xl shadow-md w-[40vw] md:w-[10vw] bg-white overflow-hidden right-0 top-12 text-sm">
-          {/* <div className="flex flex-col cursor-pointer"> */}
           {user ? (
             <div className="flex flex-col cursor-pointer">
               <Link
@@ -49,10 +48,10 @@ const MenuDropdown = () => {
                 Home
               </Link>
               <Link
-                to="/dashbord"
+                to="/dashboard"
                 className="px-4 py-3 hover:bg-neutral-100 transition font-semibold"
               >
-                Dashbord
+                Dashboard
               </Link>
               <div className="bg-red-400 text-center py-3 text-white font-semibold cursor-pointer">
                 <button onClick={() => logOut()}>LogOut</button>
@@ -81,7 +80,6 @@ const MenuDropdown = () => {
               </Link>
             </div>
           )}
-          {/* </div> */}
         </div>
       )}
     </div>

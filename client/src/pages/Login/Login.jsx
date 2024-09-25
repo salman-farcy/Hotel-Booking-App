@@ -55,11 +55,11 @@ const Login = () => {
       await signInWithGoogle()
       navigate(from, { replace: true })
       toast.success('Successfully SingUp', {id: tostId})
+      setLoading(false)
       //? 05 Save user data in database
 
       //? 06 get token
     } catch (err) {
-      console.log(err)
       toast.error(err.message, {id: tostId})
       setLoading(false)
     }

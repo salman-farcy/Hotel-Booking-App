@@ -1,13 +1,15 @@
 import { DateRange } from 'react-date-range'
 
-const Calender = ({ value, handleSelect }) => {
+const Calender = () => {
   return (
     <DateRange
-      rangeColors={['#F43F5E']}
-      direction='vertical'
-      showDateDisplay={false}
-      
-    />
+          showDateDisplay={false}
+          rangeColors={["#F6536D"]}
+          editableDateInputs={true}
+          onChange={(item) => setState([item.selection])}
+          moveRangeOnFirstSelection={false}
+          ranges={state}
+        />
   )
 }
 
