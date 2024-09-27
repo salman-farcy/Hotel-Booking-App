@@ -10,5 +10,5 @@ export const imgUploadImgbb = async (image) => {
     `https://api.imgbb.com/1/upload?key=${import.meta.env.VITE_IMGBB_API_KEY}`,
     fromData
   );
-  return data;
+  return data?.data?.display_url;
 };

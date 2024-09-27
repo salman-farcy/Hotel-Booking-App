@@ -34,7 +34,7 @@ const SignUp = () => {
       console.log(result);
 
       //? 04 set user name and profile
-      await updateUserProfile(name, imageData?.data?.display_url);
+      await updateUserProfile(name, imageData);
       navigate(from, { replace: true })
       toast.success('Successfully SingUp', {id: tostId})
       setLoading(false)
@@ -80,7 +80,7 @@ const SignUp = () => {
         >
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block mb-2 text-sm">
+              <label htmlFor="name" className="block mb-2 text-sm">
                 Name
               </label>
               <input
