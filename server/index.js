@@ -79,12 +79,35 @@ async function run() {
       }
     })
 
-    // Get all Room
+    // Get all Rooms
     app.get("/rooms", async (req, res) => {
       const category = req.query.category
       let query = {}
       if(category && category !== "null") query = {category}
       const result = await roomsCollection.find(query).toArray()
+      res.send(result)
+    })
+
+    // Get all room  for host
+    app.get("/my-listings/:email" , async (req, res) => {
+      const email = req.params.email
+      const query = {'host.email': email}
+      const result = await roomsCollection.find(query).toArray()
+      res.send(result)
+    })
+
+    // delete a room 
+    app.delete("/room/:id", async (req, res) => {
+      const id = req.params.id
+      const query = {_id: new ObjectId(id)}
+      const result = await roomsCollection.deleteOne(query) 
+      res.send(result)
+    })
+
+    // Post save Room
+    app.post('/room', async (req, res) => {
+      const roomData = req.body
+      const result = await roomsCollection.insertOne(roomData)
       res.send(result)
     })
 
