@@ -3,20 +3,72 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import useAuth from "../../../hooks/useAuth";
 import avatarImg from "../../../assets/images/placeholder.jpg";
+import HostModal from "../../Modal/HostModal";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import toast from "react-hot-toast";
 
 const MenuDropdown = () => {
+  const axiosSecure = useAxiosSecure();
+
   const [isOpen, setIsOpen] = useState(false);
   const { user, logOut } = useAuth();
+
+  // for modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  // modalHandler
+  const modalHandler = async () => {
+    console.log("I want to be a host");
+
+    try {
+      const currentUser = {
+        email: user?.email,
+        role: "guest",
+        status: "Requested",
+      };
+      const { data } = await axiosSecure.put(`/user`, currentUser);
+
+      if (data.modifiedCount > 0) {
+        toast.success("Success! your host request Please wait for admin approval", {
+          icon: "🥳",
+        })
+      } else {
+        toast.success("Please wait for admin approval!", { icon: "🧐" });
+      }
+
+    } catch (err) {
+      toast.error(err.message);
+    }finally{
+
+      closeModal();
+    }
+
+  };
 
   return (
     <div className="relative">
       <div className="flex flex-row items-center gap-3">
         {/* Become A Host btn */}
-        <div className="hidden md:block">
-          <button className="disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition">
-            Host your home
-          </button>
+
+        <div onClick={() => setIsModalOpen(true)} className="hidden md:block">
+          {
+            <button className="disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition">
+              Host your home
+            </button>
+          }
         </div>
+
+        {/* Modal  */}
+        <HostModal
+          modalHandler={modalHandler}
+          closeModal={closeModal}
+          isOpen={isModalOpen}
+        />
+
         {/* Dropdown btn */}
         <div
           onClick={() => setIsOpen(!isOpen)}

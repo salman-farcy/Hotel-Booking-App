@@ -5,10 +5,17 @@ import useAuth from "../../hooks/useAuth";
 import { TbFidgetSpinner } from "react-icons/tb";
 import toast from "react-hot-toast";
 
+
 const SignUp = () => {
-  const { createUser, updateUserProfile, signInWithGoogle, setLoading, loading } = useAuth();
-  const navigate = useNavigate()
-  const location = useLocation()
+  const {
+    createUser,
+    updateUserProfile,
+    signInWithGoogle,
+    setLoading,
+    loading,
+  } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   let from = location.state?.from?.pathname || "/";
   // TODO: Use uncontrole from handle
   const handelSubmite = async (e) => {
@@ -22,48 +29,52 @@ const SignUp = () => {
     const password = form.password.value;
     const image = form.image.files[0];
 
-    const tostId = toast.loading("SignUp...")
+    const tostId = toast.loading("SignUp...");
 
     try {
-      setLoading(true)
+      setLoading(true);
       //? 02 Process of uploading images to imgBB
       const imageData = await imgUploadImgbb(image);
 
       //? 03 Process of creating user in firebase
       const result = await createUser(email, password);
-      console.log(result);
+      console.log(result)
 
       //? 04 set user name and profile
       await updateUserProfile(name, imageData);
-      navigate(from, { replace: true })
-      toast.success('Successfully SingUp', {id: tostId})
-      setLoading(false)
+      navigate(from, { replace: true });
+      toast.success("Successfully SingUp", { id: tostId });
+      setLoading(false);
+
       //? 05 Save user data in database
+       
+        
+      
 
       //? 06 get token
     } catch (err) {
-      toast.error(err, {id: tostId})
-      setLoading(false)
+      toast.error(err.message, { id: tostId });
+      setLoading(false);
     }
   };
 
   //* signUp use Google
   const handelUseGoogle = async () => {
-    const tostId = toast.loading("SignUp...")
+    const tostId = toast.loading("SignUp...");
     try {
-      setLoading(true)
-      await signInWithGoogle()
-      navigate(from, { replace: true })
-      toast.success('Successfully SingUp', {id: tostId})
-      setLoading(false)
+      setLoading(true);
+      await signInWithGoogle();
+      navigate(from, { replace: true });
+      toast.success("Successfully SingUp", { id: tostId });
+      setLoading(false);
       //? 05 Save user data in database
 
       //? 06 get token
     } catch (err) {
-      toast.error(err.message, {id: tostId})
-      setLoading(false)
+      toast.error(err.message, { id: tostId });
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen">
@@ -142,7 +153,11 @@ const SignUp = () => {
               type="submit"
               className="bg-rose-500 w-full rounded-md py-3 text-white"
             >
-             {loading ? <TbFidgetSpinner className="animate-spin m-auto"/> : 'Continue'}
+              {loading ? (
+                <TbFidgetSpinner className="animate-spin m-auto" />
+              ) : (
+                "Continue"
+              )}
             </button>
           </div>
         </form>
@@ -153,7 +168,11 @@ const SignUp = () => {
           </p>
           <div className="flex-1 h-px sm:w-16 dark:bg-gray-700"></div>
         </div>
-        <button disabled={loading} onClick={handelUseGoogle} className="flex justify-center items-center space-x-2 border m-3 p-2 border-gray-300 border-rounded disabled:cursor-not-allowed cursor-pointer">
+        <button
+          disabled={loading}
+          onClick={handelUseGoogle}
+          className="flex justify-center items-center space-x-2 border m-3 p-2 border-gray-300 border-rounded disabled:cursor-not-allowed cursor-pointer"
+        >
           <FcGoogle size={32} />
           <p>Continue with Google</p>
         </button>

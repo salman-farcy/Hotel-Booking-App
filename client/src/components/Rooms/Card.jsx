@@ -6,7 +6,7 @@ const Card = ({ room }) => {
     <Link to={`/room/${room?._id}`} className="col-span-1 cursor-pointer group">
       <div className="flex flex-col  w-full">
         <div className="aspect-square w-full relative overflow-hidden rounded-md">
-          <img className="object-cover h-full w-full group-hover:scale-110 transition"
+          <img className="object-cover h-full w-full group-hover:scale-105 transition"
             src={room?.image}
             alt="Room"
           />

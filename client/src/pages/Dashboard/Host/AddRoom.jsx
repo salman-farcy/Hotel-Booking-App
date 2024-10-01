@@ -6,19 +6,22 @@ import { Helmet } from 'react-helmet-async'
 import toast from "react-hot-toast";
 import { useMutation } from "@tanstack/react-query";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import { useNavigate } from "react-router-dom";
 
 
 const AddRoom = () => {
   const { user } = useAuth();
   const axiosSecure = useAxiosSecure()
+  const navigate = useNavigate()
 
+  const [loading, setLoading] = useState(false)
   const [imagePreview, setImagePreview] = useState();
   const [imageText, setImageText] = useState("Upload Image")
 
 
   const [datas, setDatas] = useState({
     startDate: new Date(),
-    endDate: null,
+    endDate: new Date(),
     key: "selection",
   });
 
@@ -34,6 +37,8 @@ const AddRoom = () => {
     },
     onSuccess: () => {
       toast.success("Room Add Success")
+      setLoading(false)  
+      navigate('/dashboard/my-listings')
     }
     
   })
@@ -41,6 +46,8 @@ const AddRoom = () => {
   // From Handler
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setLoading(true)
 
     const form = e.target;
     const location = form.location.value;
@@ -60,7 +67,7 @@ const AddRoom = () => {
       name: user?.displayName,
       image: user?.photoURL,
       email: user?.email,
-    };
+    }; 
 
     try {
       // image uploding
@@ -80,15 +87,13 @@ const AddRoom = () => {
         image: image_url,
       };
 
-      // console.table(roomData);
-
       // Post request to servcer
        await mutateAsync(roomData)
-     
+       
     } catch (err) {
-      console.log(err);
+      toast.error(err.message)
+      setLoading(false)
     }
-    console.log("salman");
   };
 
 
@@ -112,6 +117,7 @@ const AddRoom = () => {
         handelImage={handelImage}
         imagePreview={imagePreview}
         imageText={imageText}
+        loading={loading}
       />
     </div>
   );
