@@ -6,12 +6,14 @@ import avatarImg from "../../../assets/images/placeholder.jpg";
 import HostModal from "../../Modal/HostModal";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import toast from "react-hot-toast";
+import useRole from "../../../hooks/useRole";
 
 const MenuDropdown = () => {
   const axiosSecure = useAxiosSecure();
 
   const [isOpen, setIsOpen] = useState(false);
   const { user, logOut } = useAuth();
+  const [role, isLoading] = useRole()
 
   // for modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,7 +55,7 @@ const MenuDropdown = () => {
         {/* Become A Host btn */}
 
         <div onClick={() => setIsModalOpen(true)} className="hidden md:block">
-          {user &&
+          {user && role === 'guest' &&
             <button className="disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition">
               Host your home
             </button>

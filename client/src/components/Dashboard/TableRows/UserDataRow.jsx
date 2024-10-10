@@ -1,5 +1,42 @@
 import PropTypes from "prop-types";
+import UpdateUserModal from "../../Modal/UpdateUserModal";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import toast from "react-hot-toast";
 const UserDataRow = ({ user, i, refetch }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const axiosSecure = useAxiosSecure()
+
+  // user role Update Using useMutation
+  const {mutateAsync} = useMutation({
+    mutationFn: async (user) => {
+      const {data} = await axiosSecure.patch(`/users/update/${user?.email}`, user)
+      return data
+    }, 
+    onSuccess: () => {
+      refetch()
+      toast.success("Update User Role")
+      setIsOpen(false)
+    }
+  })
+
+   //   Modal handler 
+   const modalHandler = async (selected, email) => {
+    const user = {
+      email: email,
+      role: selected,
+      status: "verified"
+    }
+    
+    try{
+      await mutateAsync(user) 
+    }catch(err){
+      console.log(err.message)
+    }
+
+   }
+
   return (
     <tr>
       <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
@@ -32,7 +69,7 @@ const UserDataRow = ({ user, i, refetch }) => {
       </td>
 
       <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-        <span className="relative cursor-pointer inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+        <span onClick={() => setIsOpen(true)} className="relative cursor-pointer inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
           <span
             aria-hidden="true"
             className="absolute inset-0 bg-green-200 opacity-50 rounded-full"
@@ -40,6 +77,7 @@ const UserDataRow = ({ user, i, refetch }) => {
           <span className="relative">Update Role</span>
         </span>
         {/* Update User Modal */}
+      <UpdateUserModal modalHandler={modalHandler} setIsOpen={setIsOpen} isOpen={isOpen} user={user} />
       </td>
     </tr>
   );
