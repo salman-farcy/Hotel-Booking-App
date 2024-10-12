@@ -4,38 +4,46 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import toast from "react-hot-toast";
+import useAuth from "../../../hooks/useAuth";
 const UserDataRow = ({ user, i, refetch }) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const axiosSecure = useAxiosSecure()
+  const { user: logdinUser } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const axiosSecure = useAxiosSecure();
 
   // user role Update Using useMutation
-  const {mutateAsync} = useMutation({
+  const { mutateAsync } = useMutation({
     mutationFn: async (user) => {
-      const {data} = await axiosSecure.patch(`/users/update/${user?.email}`, user)
-      return data
-    }, 
+      const { data } = await axiosSecure.patch(
+        `/users/update/${user?.email}`,
+        user
+      );
+      return data;
+    },
     onSuccess: () => {
-      refetch()
-      toast.success("Update User Role")
-      setIsOpen(false)
-    }
-  })
+      refetch();
+      toast.success("Update User Role");
+      setIsOpen(false);
+    },
+  });
 
-   //   Modal handler 
-   const modalHandler = async (selected, email) => {
-    const user = {
+  //   Modal handler
+  const modalHandler = async (selected, email) => {
+    if (logdinUser.email === user.email) {
+      toast.error("Action Not Alowed");
+      return setIsOpen(false);
+    }
+    const userRole = {
       email: email,
       role: selected,
-      status: "verified"
-    }
-    
-    try{
-      await mutateAsync(user) 
-    }catch(err){
-      console.log(err.message)
-    }
+      status: "verified",
+    };
 
-   }
+    try {
+      await mutateAsync(userRole);
+    } catch (err) {
+      console.log(err.message);
+    }
+  };
 
   return (
     <tr>
@@ -48,11 +56,15 @@ const UserDataRow = ({ user, i, refetch }) => {
       <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
         <div
           className={`${
-            user?.role === "admin" ? "bg-green-400" : user?.role === "host" ? "bg-yellow-300" : "bg-red-300"
+            user?.role === "admin"
+              ? "bg-green-400"
+              : user?.role === "host"
+              ? "bg-yellow-300"
+              : "bg-red-300"
           } h-6 w-16 flex items-center justify-center rounded-xl text-sm`}
         >
           <p className="text-gray-900 whitespace-no-wrap">{user?.role}</p>
-        </div>  
+        </div>
       </td>
       <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
         {user?.status ? (
@@ -69,7 +81,10 @@ const UserDataRow = ({ user, i, refetch }) => {
       </td>
 
       <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-        <span onClick={() => setIsOpen(true)} className="relative cursor-pointer inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+        <span
+          onClick={() => setIsOpen(true)}
+          className="relative cursor-pointer inline-block px-3 py-1 font-semibold text-green-900 leading-tight"
+        >
           <span
             aria-hidden="true"
             className="absolute inset-0 bg-green-200 opacity-50 rounded-full"
@@ -77,7 +92,12 @@ const UserDataRow = ({ user, i, refetch }) => {
           <span className="relative">Update Role</span>
         </span>
         {/* Update User Modal */}
-      <UpdateUserModal modalHandler={modalHandler} setIsOpen={setIsOpen} isOpen={isOpen} user={user} />
+        <UpdateUserModal
+          modalHandler={modalHandler}
+          setIsOpen={setIsOpen}
+          isOpen={isOpen}
+          user={user}
+        />
       </td>
     </tr>
   );

@@ -30,36 +30,36 @@ export const router = createBrowserRouter([
   { path: "/signup", element: <SignUp /> },
   {
     path: '/dashboard', 
-    element: <DashboardLayout />,
+    element: <PrivateRoute><DashboardLayout /></PrivateRoute> ,
     children: [
       {
         // path: '/dashboard',
         index: true,
-        element: <Statistice />
+        element: <PrivateRoute><Statistice /></PrivateRoute> 
       },
       {
         path: 'add-room',
-        element: <AddRoom />
+        element: <PrivateRoute><AddRoom /></PrivateRoute>
       },
       {
         path: 'my-listings',
-        element: <MyListings />
+        element:<PrivateRoute><MyListings /></PrivateRoute> 
       },
       {
         path: '/dashboard/profile',
-        element: <Profile />
+        element:<PrivateRoute><Profile /></PrivateRoute> 
       },
       {
         path: 'my-bookings',
-        element: <p>My Bookings</p>
+        element:<PrivateRoute><p>My Bookings</p></PrivateRoute> 
       },
       {
         path: 'manage-bookings',
-        element: <p>Manage Bookings</p>
+        element: <PrivateRoute><p>Manage Bookings</p></PrivateRoute> 
       },
       {
         path: 'manage-users',
-        element: <ManageUsers />
+        element: <PrivateRoute><ManageUsers /></PrivateRoute> 
       },
       
           

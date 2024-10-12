@@ -11,13 +11,14 @@ import useAxiosCommon from "../../../hooks/useAxiosCommon";
 const RoomDetails = () => {
   const { id } = useParams();
   const axiosCommon = useAxiosCommon();
+  
 
   const { data: room = {}, isLoading } = useQuery({
     queryKey: ["room", id],
     queryFn: async () => {
       const { data } = await axiosCommon.get(`/room/${id}`);
       return data;
-    },
+    }
   });
 
   if (isLoading) return <Loader />;
@@ -34,7 +35,7 @@ const RoomDetails = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-7 md:gap-10 mt-6">
           <RoomInfo room={room} />
-
+        
           {/* Calender/ RoomReservation */}
           <div className="col-span-3 order-first md:order-last">
             <RoomReservation room={room} />

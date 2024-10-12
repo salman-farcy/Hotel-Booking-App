@@ -4,7 +4,7 @@ import useAuth from "../../../hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import Heading from "../../../components/Shared/Heading";
 import UserDataRow from "../../../components/Dashboard/TableRows/UserDataRow";
-import Loader from "../../../components/Shared/Loader";
+import Loader from "../../../components/Shared/Loader";  
 
 const ManageUsers = () => {
   const axiosSecure = useAxiosSecure();
@@ -33,7 +33,6 @@ const ManageUsers = () => {
         <div className="py-8">
           <div className="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
             <div className="inline-block min-w-full shadow rounded-lg overflow-hidden">
-               
               <table className="min-w-full leading-normal">
                 <thead>
                   <tr>
@@ -72,7 +71,7 @@ const ManageUsers = () => {
                 </thead>
 
                 <tbody>
-                  {users && users?.length > 0 ? (
+                  {users && users?.length > 0 ? ( 
                     users.map((user, i) => (
                       <UserDataRow
                         key={user?._id}

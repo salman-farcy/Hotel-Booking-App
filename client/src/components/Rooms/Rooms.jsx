@@ -7,22 +7,20 @@ import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { useSearchParams } from "react-router-dom";
 
 const Rooms = () => {
-  const axiosSecure = useAxiosSecure()
-  const [params, setParams] = useSearchParams()
-  const category = params.get('category')
- 
+  const axiosSecure = useAxiosSecure();
+  const [params, setParams] = useSearchParams();
+  const category = params.get("category");
 
-  const { data: rooms=[], isLoading} = useQuery({
-    queryKey: ['rooms', category],
-    queryFn: async ( )=> {
-      const {data} = await axiosSecure.get(`/rooms?category=${category}`)
+  const { data: rooms = [], isLoading } = useQuery({
+    queryKey: ["rooms", category],
+    queryFn: async () => {
+      const { data } = await axiosSecure.get(`/rooms?category=${category}`);
       return data;
     },
-    
-  })
+  });
 
   if (isLoading) return <Loader />;
-  
+
   return (
     <Container>
       {rooms && rooms.length > 0 ? (

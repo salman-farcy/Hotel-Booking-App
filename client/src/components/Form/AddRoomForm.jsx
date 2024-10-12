@@ -23,7 +23,7 @@ const AddRoomForm = ({
                 Location
               </label>
               <input
-                className="w-full px-4 py-3 text-gray-800 border border-rose-300 focus:outline-rose-500 rounded-md "
+                className="w-full px-4 py-3  text-gray-800 border border-rose-300 focus:outline-rose-500 rounded-md "
                 name="location"
                 id="location"
                 type="text"
