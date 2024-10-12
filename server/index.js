@@ -91,8 +91,8 @@ async function run() {
           const result = await usersCollection.updateOne(query, {
             $set: { status: user?.status },
           });
-          return res.send(result)
-        }else {
+          return res.send(result);
+        } else {
           return res.send(isExist);
         }
       }
@@ -108,12 +108,12 @@ async function run() {
       res.send(result);
     });
 
-    // get a user 
-    app.get('/user/:email', async (req, res) => {
-      const email = req.params.email
-      const result = await usersCollection.findOne({email})
-      res.send(result)
-    })
+    // get a user
+    app.get("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const result = await usersCollection.findOne({ email });
+      res.send(result);
+    });
 
     // get all users data from db
     app.get("/users", async (req, res) => {
@@ -123,17 +123,18 @@ async function run() {
 
     // Update a User role
     app.patch("/users/update/:email", async (req, res) => {
-      const email = req.params.email
-      const user = req.body
-      const query = { email }
+      const email = req.params.email;
+      const user = req.body;
+      const query = { email };
       const updateDoc = {
         $set: {
-          ...user, timestamp: Date.now(),
-        }
-      }
-      const result = await usersCollection.updateOne(query, updateDoc)
-      res.send(result)
-    })
+          ...user,
+          timestamp: Date.now(),
+        },
+      };
+      const result = await usersCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
 
     // Get all Rooms
     app.get("/rooms", async (req, res) => {
