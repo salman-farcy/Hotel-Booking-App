@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
-import useAuth from "../../../hooks/useAuth";
+// import useAuth from "../../../hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import Heading from "../../../components/Shared/Heading";
 import UserDataRow from "../../../components/Dashboard/TableRows/UserDataRow";
@@ -8,7 +8,8 @@ import Loader from "../../../components/Shared/Loader";
 
 const ManageUsers = () => {
   const axiosSecure = useAxiosSecure();
-  const { user } = useAuth();
+  
+  // const { user } = useAuth();
 
   // Fetch users Data
   const {

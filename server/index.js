@@ -21,13 +21,12 @@ app.use(morgan("dev"));
 
 const verifyToken = async (req, res, next) => {
   const token = req.cookies?.token;
-  console.log(token);
+  console.log("test Token",token)
   if (!token) {
     return res.status(401).send({ message: "unauthorized access" });
   }
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
-      console.log(err);
       return res.status(401).send({ message: "unauthorized access" });
     }
     req.user = decoded;
@@ -47,12 +46,22 @@ async function run() {
     const roomsCollection = client.db("HotelBookingApp").collection("rooms");
     const usersCollection = client.db("HotelBookingApp").collection("users");
 
+    // Verify admin middkeware
+    const verifyAdmin = async (req, res, next) => {
+      const user = req.user;
+      const query = { email: user.email};
+      const result = await usersCollection.findOne(query)
+      if (!result || result?.role !== "admin")
+        return res.status(401).send({ message: "Unauthorize access" });
+      next();
+    };
+
     // auth related api
     app.post("/jwt", async (req, res) => {
-      const user = req.body;
-      console.log("I need a new jwt", user);
+      const user = req.body
+      console.log("User Exist seerverSite? ",user)
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "365d",
+        expiresIn: "24h",
       });
       res
         .cookie("token", token, {
@@ -116,7 +125,7 @@ async function run() {
     });
 
     // get all users data from db
-    app.get("/users", async (req, res) => {
+    app.get("/users", verifyToken, verifyAdmin, async (req, res) => {
       const result = await usersCollection.find().toArray();
       res.send(result);
     });

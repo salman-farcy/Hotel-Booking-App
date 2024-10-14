@@ -1,18 +1,19 @@
-import { Link, useLocation, useNavigate,  } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 import { TbFidgetSpinner } from "react-icons/tb";
 import { useState } from "react";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const Login = () => {
-  const { signIn, signInWithGoogle, loading, resetPassword, setLoading } = useAuth();
-  const [email, setEmail] = useState('')
-  const navigate = useNavigate()
-  const location = useLocation()
+  const axiosSecure = useAxiosSecure()
+  const { signIn, signInWithGoogle, loading, resetPassword, setLoading } =
+    useAuth();
+  const [email, setEmail] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
   let from = location.state?.from?.pathname || "/";
-
-  
 
   // login email
   const handleLogin = async (e) => {
@@ -20,50 +21,67 @@ const Login = () => {
     const form = e.target;
     const email = form.email.value;
     const password = form.password.value;
-
-    const tostId = toast.loading("LogIn ...")
-    try{
-      setLoading(true)
+    const tostId = toast.loading("LogIn ...");
+    try {
+      setLoading(true);
       //? 02 Process of Login user in firebase
-      await signIn(email, password);
-      navigate(from, { replace: true })
-      toast.success('Successfully SingUp', {id: tostId})
-    }catch(err){
-      toast.error(err.message, {id: tostId})
-      setLoading(false)
+      const userCredential = await signIn(email, password);
+      const { user } = userCredential;
+      navigate(from, { replace: true });
+      toast.success("Successfully SingUp", { id: tostId });
+
+      // get token
+      if (user && user.email) {
+        const email = user.email;
+        const response = await axiosSecure.post('/jwt', { email });
+        console.log('Token created successfully:', response.data);
+      }else{
+        toast.error("User email not found", { id: tostId });
+      }
+    } catch (err) {
+      toast.error(err.message, { id: tostId });
+      setLoading(false);
     }
   };
 
   //* reset password
   const handleResetPassword = async () => {
-    if(!email) return toast.error("Please Enter Email")
-    try{
-      await resetPassword(email)
-      toast.success('reset password secees')
-      setLoading(false)
-    }catch(err){
-      toast.error(err.message)
-      setLoading(false)
+    if (!email) return toast.error("Please Enter Email");
+    try {
+      await resetPassword(email);
+      toast.success("reset password secees");
+      setLoading(false);
+    } catch (err) {
+      toast.error(err.message);
+      setLoading(false);
     }
-  }
+  };
 
   //* login use Google
   const handelUseGoogle = async () => {
-    const tostId = toast.loading("LogIn...")
+    const tostId = toast.loading("LogIn...");
     try {
-      setLoading(true)
-      await signInWithGoogle()
-      navigate(from, { replace: true })
-      toast.success('Successfully SingUp', {id: tostId})
-      setLoading(false)
+      setLoading(true);  
+      const userCredential = await signInWithGoogle();
+      const { user } = userCredential;
+      navigate(from, { replace: true });
+      toast.success("Successfully SingUp", { id: tostId });
+      setLoading(false);
       //? 05 Save user data in database
 
       //? 06 get token
+      if (user && user.email) {
+        const email = user.email;
+        const response = await axiosSecure.post('/jwt', { email });
+        console.log('Token created successfully:', response.data);
+      }else{
+        toast.error("User email not found", { id: tostId });
+      }
     } catch (err) {
-      toast.error(err.message, {id: tostId})
-      setLoading(false)
+      toast.error(err.message, { id: tostId });
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen">
@@ -119,12 +137,19 @@ const Login = () => {
               type="submit"
               className="bg-rose-500 w-full rounded-md py-3 text-white"
             >
-              {loading ? <TbFidgetSpinner className="animate-spin m-auto" /> : "Continue"}
+              {loading ? (
+                <TbFidgetSpinner className="animate-spin m-auto" />
+              ) : (
+                "Continue"
+              )}
             </button>
           </div>
         </form>
         <div className="space-y-1">
-          <button onClick={handleResetPassword} className="text-xs hover:underline hover:text-rose-500 text-gray-400">
+          <button
+            onClick={handleResetPassword}
+            className="text-xs hover:underline hover:text-rose-500 text-gray-400"
+          >
             Forgot password?
           </button>
         </div>
@@ -135,7 +160,11 @@ const Login = () => {
           </p>
           <div className="flex-1 h-px sm:w-16 dark:bg-gray-700"></div>
         </div>
-        <button disabled={loading} onClick={handelUseGoogle} className="flex justify-center items-center space-x-2 border m-3 p-2 border-gray-300 border-rounded disabled:cursor-not-allowed cursor-pointer">
+        <button
+          disabled={loading}
+          onClick={handelUseGoogle}
+          className="flex justify-center items-center space-x-2 border m-3 p-2 border-gray-300 border-rounded disabled:cursor-not-allowed cursor-pointer"
+        >
           <FcGoogle size={32} />
 
           <p>Continue with Google</p>

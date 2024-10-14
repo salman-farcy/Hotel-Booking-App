@@ -4,9 +4,12 @@ import { imgUploadImgbb } from "../../api/utils";
 import useAuth from "../../hooks/useAuth";
 import { TbFidgetSpinner } from "react-icons/tb";
 import toast from "react-hot-toast";
+// import useAxiosSecure from "../../hooks/useAxiosSecure";
+
 
 
 const SignUp = () => {
+  // const AxiosSecure = useAxiosSecure()
   const {
     createUser,
     updateUserProfile,
@@ -38,7 +41,8 @@ const SignUp = () => {
 
       //? 03 Process of creating user in firebase
       const result = await createUser(email, password);
-      console.log(result)
+      console.log(result?.user?.email)
+      
 
       //? 04 set user name and profile
       await updateUserProfile(name, imageData);
@@ -47,11 +51,14 @@ const SignUp = () => {
       setLoading(false);
 
       //? 05 Save user data in database
-       
+        
         
       
 
       //? 06 get token
+      // const getToken = await AxiosSecure.post("/jwt", result?.user?.email)
+      // console.log(getToken)
+
     } catch (err) {
       toast.error(err.message, { id: tostId });
       setLoading(false);
