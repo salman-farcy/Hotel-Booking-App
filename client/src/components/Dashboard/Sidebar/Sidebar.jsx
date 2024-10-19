@@ -17,7 +17,6 @@ const Sidebar = () => {
   const [isActive, setActive] = useState(false);
   const [togle, setTogle] = useState(true);
   const [role] = useRole();
-  console.log(role);
 
   // Sidebar Responsive Handler
   const handleToggle = () => {

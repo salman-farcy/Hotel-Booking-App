@@ -6,12 +6,12 @@ import { TbFidgetSpinner } from "react-icons/tb";
 import { useState } from "react";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 
+
 const Login = () => {
-  const axiosSecure = useAxiosSecure()
-  const { signIn, signInWithGoogle, loading, resetPassword, setLoading } =
-    useAuth();
-  const [email, setEmail] = useState("");
+  const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
+  const { signIn, signInWithGoogle, loading, resetPassword, setLoading } = useAuth();
+  const [email, setEmail] = useState("");
   const location = useLocation();
   let from = location.state?.from?.pathname || "/";
 
@@ -33,9 +33,9 @@ const Login = () => {
       // get token
       if (user && user.email) {
         const email = user.email;
-        const response = await axiosSecure.post('/jwt', { email });
-        console.log('Token created successfully:', response.data);
-      }else{
+        const response = await axiosSecure.post("/jwt", { email });
+        console.log("Token created successfully:", response.data);
+      } else {
         toast.error("User email not found", { id: tostId });
       }
     } catch (err) {
@@ -61,7 +61,7 @@ const Login = () => {
   const handelUseGoogle = async () => {
     const tostId = toast.loading("LogIn...");
     try {
-      setLoading(true);  
+      setLoading(true);
       const userCredential = await signInWithGoogle();
       const { user } = userCredential;
       navigate(from, { replace: true });
@@ -72,9 +72,9 @@ const Login = () => {
       //? 06 get token
       if (user && user.email) {
         const email = user.email;
-        const response = await axiosSecure.post('/jwt', { email });
-        console.log('Token created successfully:', response.data);
-      }else{
+        const response = await axiosSecure.post("/jwt", { email });
+        console.log("Token created successfully:", response.data);
+      } else {
         toast.error("User email not found", { id: tostId });
       }
     } catch (err) {
@@ -82,7 +82,6 @@ const Login = () => {
       setLoading(false);
     }
   };
-
   return (
     <div className="flex justify-center items-center min-h-screen">
       <div className="flex flex-col max-w-md p-6 rounded-md sm:p-10 bg-gray-100 text-gray-900">

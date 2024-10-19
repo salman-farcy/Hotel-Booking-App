@@ -5,15 +5,15 @@ import useAuth from "../../../hooks/useAuth";
 import avatarImg from "../../../assets/images/placeholder.jpg";
 import HostModal from "../../Modal/HostModal";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
-import toast from "react-hot-toast";
 import useRole from "../../../hooks/useRole";
+import { BecomeAHostmodalHandler } from "../../../hooks/ReUseFunction/BecomeAHost";
 
 const MenuDropdown = () => {
   const axiosSecure = useAxiosSecure();
 
   const [isOpen, setIsOpen] = useState(false);
   const { user, logOut } = useAuth();
-  const [role, isLoading] = useRole()
+  const [role, isLoading] = useRole();
 
   // for modal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,49 +22,24 @@ const MenuDropdown = () => {
     setIsModalOpen(false);
   };
 
-  // modalHandler
-  const modalHandler = async () => {
-    try {
-      const currentUser = {
-        email: user?.email,
-        role: "guest",
-        status: "Requested",
-      };
-      const { data } = await axiosSecure.put(`/user`, currentUser);
-
-      if (data.modifiedCount > 0) {
-        toast.success("Success! your host request Please wait for admin approval", {
-          icon: "🥳",
-        })
-      } else {
-        toast.success("Please wait for admin approval!", { icon: "🧐" });
-      }
-
-    } catch (err) {
-      toast.error(err.message);
-    }finally{
-
-      closeModal();
-    }
-
-  };
-
   return (
     <div className="relative">
       <div className="flex flex-row items-center gap-3">
         {/* Become A Host btn */}
 
         <div onClick={() => setIsModalOpen(true)} className="hidden md:block">
-          {user && role === 'guest' &&
+          {user && role === "guest" && (
             <button className="disabled:cursor-not-allowed cursor-pointer hover:bg-neutral-100 py-3 px-4 text-sm font-semibold rounded-full  transition">
               Host your home
             </button>
-          }
+          )}
         </div>
 
         {/* Modal  */}
         <HostModal
-          modalHandler={modalHandler}
+          modalHandler={() =>
+            BecomeAHostmodalHandler(user, axiosSecure, closeModal)
+          }
           closeModal={closeModal}
           isOpen={isModalOpen}
         />
