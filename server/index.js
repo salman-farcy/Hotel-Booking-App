@@ -7,6 +7,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
 const morgan = require("morgan");
 const port = process.env.PORT || 8000;
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // middleware
 const corsOptions = {
@@ -21,7 +22,6 @@ app.use(morgan("dev"));
 
 const verifyToken = async (req, res, next) => {
   const token = req.cookies?.token;
-  console.log("test Token",token)
   if (!token) {
     return res.status(401).send({ message: "unauthorized access" });
   }
@@ -43,14 +43,16 @@ const client = new MongoClient(process.env.DB_URI, {
 });
 async function run() {
   try {
-    const roomsCollection = client.db("HotelBookingApp").collection("rooms");
-    const usersCollection = client.db("HotelBookingApp").collection("users");
+    const db = client.db("HotelBookingApp")
+    const roomsCollection = db.collection("rooms");
+    const usersCollection = db.collection("users");
+    const bookingCollection = db.collection("bookings");
 
     // Verify admin middkeware
     const verifyAdmin = async (req, res, next) => {
       const user = req.user;
-      const query = { email: user.email};
-      const result = await usersCollection.findOne(query)
+      const query = { email: user.email };
+      const result = await usersCollection.findOne(query);
       if (!result || result?.role !== "admin")
         return res.status(401).send({ message: "Unauthorize access" });
       next();
@@ -59,17 +61,16 @@ async function run() {
     // Verify Host middkeware
     const verifyHost = async (req, res, next) => {
       const user = req.user;
-      const query = { email: user.email};
-      const result = await usersCollection.findOne(query)
+      const query = { email: user.email };
+      const result = await usersCollection.findOne(query);
       if (!result || result?.role !== "host")
         return res.status(401).send({ message: "Unauthorize access" });
       next();
     };
 
     // auth related api
-    app.post("/jwt", async (req, res) => {
-      const user = req.body
-      console.log("User Exist seerverSite? ",user)
+      app.post("/jwt", async (req, res) => {
+      const user = req.body;
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "24h",
       });
@@ -96,6 +97,25 @@ async function run() {
       } catch (err) {
         res.status(500).send(err);
       }
+    });
+
+    // create-payment-intent
+    app.post("/create-payment-intent", verifyToken, async (req, res) => {
+      const price = req.body.price;
+      const priceInCent = parseFloat(price) * 100;
+
+      if(!price || priceInCent < 1) return 
+      // generate clientSecret
+      const {client_secret} = await stripe.paymentIntents.create({
+        amount: priceInCent,
+        currency: "usd",
+        // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
+        automatic_payment_methods: {
+          enabled: true,
+        },
+      });
+      // send client secret as response
+      res.send({clientSecret: client_secret})
     });
 
     // save User data in db
@@ -165,12 +185,17 @@ async function run() {
     });
 
     // Get all room  for host
-    app.get("/my-listings/:email", verifyToken, verifyHost, async (req, res) => {
-      const email = req.params.email;
-      const query = { "host.email": email };
-      const result = await roomsCollection.find(query).toArray();
-      res.send(result);
-    });
+    app.get(
+      "/my-listings/:email",
+      verifyToken,
+      verifyHost,
+      async (req, res) => {
+        const email = req.params.email;
+        const query = { "host.email": email };
+        const result = await roomsCollection.find(query).toArray();
+        res.send(result);
+      }
+    );
 
     // delete a room
     app.delete("/room/:id", verifyToken, verifyHost, async (req, res) => {
