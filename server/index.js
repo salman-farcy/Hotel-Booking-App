@@ -46,7 +46,7 @@ async function run() {
     const db = client.db("HotelBookingApp")
     const roomsCollection = db.collection("rooms");
     const usersCollection = db.collection("users");
-    const bookingCollection = db.collection("bookings");
+    const bookingsCollection = db.collection("bookings");
 
     // Verify admin middkeware
     const verifyAdmin = async (req, res, next) => {
@@ -211,6 +211,26 @@ async function run() {
       const result = await roomsCollection.insertOne(roomData);
       res.send(result);
     });
+
+     // Post save a booking
+     app.post("/booking", verifyToken, async (req, res) => {
+      const bookingData = req.body;
+      const result = await bookingsCollection.insertOne(bookingData);
+      res.send(result);
+    });
+
+    // update room Status
+    app.patch('/room/status/:id', async (req, res) => {
+      const id = req.params.id
+      const status = req.body.status
+      // chsnge roon availablity status
+      const query = { _id: new ObjectId(id)}
+      const updateDoc = {
+        $set: {booked: status},
+      }
+      const result = await roomsCollection.updateOne(query, updateDoc)
+      res.send(result)
+    })
 
     // get a single room data from db using _ID
     app.get("/room/:roomId", async (req, res) => {
