@@ -43,7 +43,7 @@ const client = new MongoClient(process.env.DB_URI, {
 });
 async function run() {
   try {
-    const db = client.db("HotelBookingApp")
+    const db = client.db("HotelBookingApp");
     const roomsCollection = db.collection("rooms");
     const usersCollection = db.collection("users");
     const bookingsCollection = db.collection("bookings");
@@ -69,7 +69,7 @@ async function run() {
     };
 
     // auth related api
-      app.post("/jwt", async (req, res) => {
+    app.post("/jwt", async (req, res) => {
       const user = req.body;
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "24h",
@@ -104,9 +104,9 @@ async function run() {
       const price = req.body.price;
       const priceInCent = parseFloat(price) * 100;
 
-      if(!price || priceInCent < 1) return 
+      if (!price || priceInCent < 1) return;
       // generate clientSecret
-      const {client_secret} = await stripe.paymentIntents.create({
+      const { client_secret } = await stripe.paymentIntents.create({
         amount: priceInCent,
         currency: "usd",
         // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
@@ -115,7 +115,7 @@ async function run() {
         },
       });
       // send client secret as response
-      res.send({clientSecret: client_secret})
+      res.send({ clientSecret: client_secret });
     });
 
     // save User data in db
@@ -212,25 +212,49 @@ async function run() {
       res.send(result);
     });
 
-     // Post save a booking
-     app.post("/booking", verifyToken, async (req, res) => {
+    // Post save a booking
+    app.post("/booking", verifyToken, async (req, res) => {
       const bookingData = req.body;
       const result = await bookingsCollection.insertOne(bookingData);
       res.send(result);
     });
 
     // update room Status
-    app.patch('/room/status/:id', async (req, res) => {
-      const id = req.params.id
-      const status = req.body.status
+    app.patch("/room/status/:id", async (req, res) => {
+      const id = req.params.id;
+      const status = req.body.status;
       // chsnge roon availablity status
-      const query = { _id: new ObjectId(id)}
+      const query = { _id: new ObjectId(id) };
       const updateDoc = {
-        $set: {booked: status},
-      }
-      const result = await roomsCollection.updateOne(query, updateDoc)
+        $set: { booked: status },
+      };
+      const result = await roomsCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
+
+    // get all booling for a guest depend on a guest email
+    app.get("/my-bookings/:email", verifyToken, async (req, res) => {
+      const email = req.params.email;
+      const query = { "guest.email": email };
+      const result = await bookingsCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    // get all booling for a Host depend on a host email
+    app.get("/manage-bookings/:email", verifyToken, verifyHost, async (req, res) => {
+      const email = req.params.email;
+      const query = { "host.email": email };
+      const result = await bookingsCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    // Delete booking
+    app.delete("/booking/:id", verifyToken, async (req, res) => {
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) };
+      const result = await bookingsCollection.deleteOne(query)
       res.send(result)
-    })
+    });
 
     // get a single room data from db using _ID
     app.get("/room/:roomId", async (req, res) => {
@@ -239,7 +263,7 @@ async function run() {
       const result = await roomsCollection.findOne(query);
       res.send(result);
     });
-
+  
     // Save or modify user email, status in DB
     app.put("/users/:email", async (req, res) => {
       const email = req.params.email;
