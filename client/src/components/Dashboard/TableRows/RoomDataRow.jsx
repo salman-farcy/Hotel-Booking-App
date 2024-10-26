@@ -63,7 +63,7 @@ const RoomDataRow = ({ room, handleDelete }) => {
         <DeleteModal
           closeModal={closeModal}
           isOpen={isOpen}
-          room={room}
+          id={room?._id}
           handleDelete={handleDelete}
         />
       </td>

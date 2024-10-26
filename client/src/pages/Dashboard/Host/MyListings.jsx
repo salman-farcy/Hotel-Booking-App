@@ -31,7 +31,7 @@ const MyListings = () => {
       return data 
     },
     onSuccess: data => {
-      console.log(data)
+      console.log(data)  
       refetch()
       toast.success("successfully deleted.")
     }

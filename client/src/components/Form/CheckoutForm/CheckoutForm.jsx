@@ -5,11 +5,14 @@ import { useEffect, useState } from "react";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
 import useAuth from "../../../hooks/useAuth";
 import { ImSpinner9 } from "react-icons/im";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
-const CheckoutForm = ({ closeModal, bookingInfo }) => {
+const CheckoutForm = ({ closeModal, bookingInfo, refetch }) => {
   const stripe = useStripe();
   const elements = useElements();
   const { user } = useAuth();
+  const navigate = useNavigate()
   const axiosSecure = useAxiosSecure();
   const [clientSecret, setClientSecret] = useState();
   const [cardError, setCardError] = useState("");
@@ -53,7 +56,6 @@ const CheckoutForm = ({ closeModal, bookingInfo }) => {
       setProcessing(false);
       return;
     } else {
-      console.log("[PaymentMethod]", paymentMethod);
       setCardError("");
     }
 
@@ -81,12 +83,24 @@ const CheckoutForm = ({ closeModal, bookingInfo }) => {
       //1.Create Payment info object
       const paymentInfo = {
         ...bookingInfo,
-        transactionId:paymentIntent.id,
+        roomId: bookingInfo._id,
+        transactionId: paymentIntent.id,
         date: new Date(),
       };
-      console.log(paymentInfo);
-      //2. Save Payment Info in booking collection (db)
-      //3. Chabge room status to booked in db
+      delete paymentInfo._id;
+      try {
+        //2. Save Payment Info in booking collection (db)
+        await axiosSecure.post("/booking", paymentInfo);
+        //3. Chabge room status to booked in db
+        await axiosSecure.patch(`/room/status/${bookingInfo?._id}`, {status: true});
+        // Update UI
+        refetch()
+        closeModal()
+        toast.success("🥳 Room Booked Successfully")
+        navigate("/dashboard/my-bookings")
+      } catch (err) {
+        console.log(err);
+      }
     }
     setProcessing(false);
   };

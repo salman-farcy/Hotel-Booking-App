@@ -1,9 +1,30 @@
 import { Helmet } from "react-helmet-async";
 import Heading from "../../../components/Shared/Heading";
 import BookingDataRow from "../../../components/Dashboard/TableRows/BookingDataRow";
+import useAxiosSecure from "../../../hooks/useAxiosSecure";
+import useAuth from "../../../hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import Loader from "../../../components/Shared/Loader";
+
 
 const MyBookings = () => {
-  const rooms = [];
+  // fetch all the bookings for thes logged in user 
+  const axiosSecure = useAxiosSecure();
+  const { user } = useAuth();
+
+  const {
+    data: bookings = [],
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["my-bookings", user?.email],
+    queryFn: async () => {
+      const { data } = await axiosSecure.get(`/my-bookings/${user?.email}`);
+      return data;
+    },
+  });
+
+  if (isLoading) return <Loader />;
   return (
     <>
       <Helmet>
@@ -27,7 +48,7 @@ const MyBookings = () => {
                       scope="col"
                       className="px-5 py-3 bg-white  border-b border-gray-200 text-gray-800  text-left text-sm uppercase font-normal"
                     >
-                      Info
+                    Host Info
                     </th>
                     <th
                       scope="col"
@@ -56,12 +77,12 @@ const MyBookings = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {rooms && rooms.length > 0 ? (
-                    rooms.map((room) => (
+                  {bookings && bookings.length > 0 ? (
+                    bookings.map((booking) => (
                       <BookingDataRow
-                        key={room._id}
-                        room={room}
-                    //     handleDelete={handleDelete}
+                        key={booking._id}
+                        booking={booking}
+                        refetch={refetch}
                       />
                     ))
                   ) : (
