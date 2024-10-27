@@ -1,10 +1,13 @@
 import React from 'react'
+import useRole from '../../../hooks/useRole'
+import AdminStatistics from '../Admin/AdminStatistics'
 
 const Statistice = () => {
+  const [role, isLoading] = useRole()
   return (
-    <div>
-      <h1>Welcome to dashbord : Statistics page</h1>
-    </div>
+    <>
+      {role === "admin" && <AdminStatistics />}
+    </>
   )
 }
 

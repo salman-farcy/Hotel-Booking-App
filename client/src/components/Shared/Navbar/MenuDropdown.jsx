@@ -22,6 +22,20 @@ const MenuDropdown = () => {
     setIsModalOpen(false);
   };
 
+  // logout handleer
+  const logoutHandler = async () => {
+    try{
+      // logout and cookies clear
+     const response = await axiosSecure.get("/logout")
+     if(response.data.success){
+       // firebvase logOut
+       logOut()
+     }
+    }catch(err){
+      console.log(err.message)
+    }
+  }
+ 
   return (
     <div className="relative">
       <div className="flex flex-row items-center gap-3">
@@ -81,7 +95,7 @@ const MenuDropdown = () => {
                 Dashboard
               </Link>
               <div className="bg-red-400 text-center py-3 text-white font-semibold cursor-pointer">
-                <button onClick={() => logOut()}>LogOut</button>
+                <button onClick={() => logoutHandler()}>LogOut</button>
               </div>
             </div>
           ) : (
