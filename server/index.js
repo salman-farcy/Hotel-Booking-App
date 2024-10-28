@@ -241,19 +241,24 @@ async function run() {
     });
 
     // get all booling for a Host depend on a host email
-    app.get("/manage-bookings/:email", verifyToken, verifyHost, async (req, res) => {
-      const email = req.params.email;
-      const query = { "host.email": email };
-      const result = await bookingsCollection.find(query).toArray();
-      res.send(result);
-    });
+    app.get(
+      "/manage-bookings/:email",
+      verifyToken,
+      verifyHost,
+      async (req, res) => {
+        const email = req.params.email;
+        const query = { "host.email": email };
+        const result = await bookingsCollection.find(query).toArray();
+        res.send(result);
+      }
+    );
 
     // Delete booking
     app.delete("/booking/:id", verifyToken, async (req, res) => {
-      const id = req.params.id
+      const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      const result = await bookingsCollection.deleteOne(query)
-      res.send(result)
+      const result = await bookingsCollection.deleteOne(query);
+      res.send(result);
     });
 
     // get a single room data from db using _ID
@@ -263,7 +268,7 @@ async function run() {
       const result = await roomsCollection.findOne(query);
       res.send(result);
     });
-  
+
     // Save or modify user email, status in DB
     app.put("/users/:email", async (req, res) => {
       const email = req.params.email;
@@ -281,6 +286,47 @@ async function run() {
         options
       );
       res.send(result);
+    });
+
+    // Admin Statistics
+    app.get("/admin-stat", verifyToken, verifyAdmin, async (req, res) => {
+      // get bookingDtail
+      const bookingDetails = await bookingsCollection
+        .find(
+          {},
+          {
+            projection: {
+              date: 1,
+              price: 1,
+            },
+          }
+        )
+        .toArray();
+
+      // get total user
+      const totalUser = await usersCollection.countDocuments();
+      // get total rooms
+      const totalRooms = await roomsCollection.countDocuments();
+      // calculet totoalPrice
+      const totalSales = bookingDetails.reduce(
+        (sum, booking) => sum + booking?.price, 0
+      );
+      // data chart create
+      const chartData = bookingDetails.map(booking => {
+        const day = new Date(booking?.date).getDate()
+        const month = new Date(booking?.date).getMonth() + 1
+        const data =  [`${day}/${month}`, booking?.price]
+        return data
+      })
+      chartData.unshift(['Day', 'Sales'])
+     
+      res.send({
+        totalUser,
+        totalRooms,
+        totalBookings: bookingDetails.length,
+        totalSales,
+        chartData
+      });
     });
 
     // Send a ping to confirm a successful connection
