@@ -374,6 +374,48 @@ async function run() {
       });
     });
 
+    // Guest Statistics 
+    app.get("/guest-stat", verifyToken, async (req, res) => {
+      const { email } = req.user
+
+      // get bookingDtail
+      const bookingDetails = await bookingsCollection
+        .find(
+          {'guest.email': email},
+          {
+            projection: {
+              date: 1,
+              price: 1,
+            },
+          }
+        )
+        .toArray();
+
+      // calculet totalSpan
+      const totalSpan = bookingDetails.reduce(
+        (sum, booking) => sum + booking?.price, 0
+      );
+
+      // Only guest timestamp get UsersColection
+      const { timestamp } = await usersCollection.findOne({email}, { projection: {timestamp: 1}} )
+
+      // data chart create
+      const chartData = bookingDetails.map(booking => {
+        const day = new Date(booking?.date).getDate()
+        const month = new Date(booking?.date).getMonth() + 1
+        const data =  [`${day}/${month}`, booking?.price]
+        return data
+      })
+      chartData.unshift(['Day', 'Span'])
+     
+      res.send({
+        totalBookings: bookingDetails.length,
+        guestSince: timestamp,
+        totalSpan,
+        chartData,
+      });
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
