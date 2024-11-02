@@ -113,6 +113,7 @@ const MyListings = () => {
                         key={room._id}
                         room={room}
                         handleDelete={handleDelete}
+                        refetch={refetch}
                       />
                     ))
                   ) : (

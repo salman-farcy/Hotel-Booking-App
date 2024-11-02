@@ -6,11 +6,7 @@ const HostMenu = () => {
     <>
       <MenuItem icon={BsFillHouseAddFill} label="Add Room" address="add-room" />
       <MenuItem icon={MdHomeWork} label="My Listings" address="my-listings" />
-      <MenuItem
-        icon={MdOutlineManageHistory}
-        label="Manage Bookings"
-        address="manage-bookings"
-      />
+      <MenuItem icon={MdOutlineManageHistory} label="Manage Bookings" address="manage-bookings" />
     </>
   );
 };

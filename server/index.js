@@ -232,6 +232,18 @@ async function run() {
       res.send(result);
     });
 
+    // Update room data
+    app.put('/room/update/:id', verifyToken, verifyHost, async (req, res) => {
+      const id = req.params.id
+      const roomData = req.body
+      const query = { _id: new ObjectId(id)}
+      const updateDoc = {
+         $set: roomData, 
+      }
+      const result = await roomsCollection.updateOne(query, updateDoc)
+      res.send(result)
+    })
+
     // get all booling for a guest depend on a guest email
     app.get("/my-bookings/:email", verifyToken, async (req, res) => {
       const email = req.params.email;
