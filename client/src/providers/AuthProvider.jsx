@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import { createContext, useEffect, useState } from "react";
+import axios from 'axios'
 import {
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
@@ -53,11 +54,25 @@ const AuthProvider = ({ children }) => {
     });
   };
 
+  // save user 
+  const saveUser = async (user) => {
+    const currentUser = {
+      email: user?.email,
+      role: "guest",
+      status: 'verified',
+    }
+    const {data} = await axios.put(`${import.meta.env.VITE_API_URL}/user`, currentUser)
+    return data 
+  }
+
   // onAuthStateChange
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      console.log("CurrentUser-->", currentUser);
+      if(currentUser){
+        saveUser(currentUser)
+      }
+      // console.log("CurrentUser-->", currentUser);
       setLoading(false);
     });
     return () => {
