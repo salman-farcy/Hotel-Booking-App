@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 require("dotenv").config();
 const cors = require("cors");
+const nodemailer = require("nodemailer");
 const cookieParser = require("cookie-parser");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
@@ -144,6 +145,11 @@ async function run() {
         },
       };
       const result = await usersCollection.updateOne(query, updateDoc, options);
+      // Welcome new User
+      sendEmail(user?.email, {
+        subject: "Welcome ! to My HOtel",
+        message: `Browse Rooms and book them.`
+      })
       res.send(result);
     });
 
@@ -216,6 +222,19 @@ async function run() {
     app.post("/booking", verifyToken, async (req, res) => {
       const bookingData = req.body;
       const result = await bookingsCollection.insertOne(bookingData);
+
+      // send Email to guest
+      sendEmail(bookingData?.guest?.email, {
+        subject: 'Booking Successfull!',
+        message: `You've  successfully booked a room through stayVista. Transaction Id: ${bookingData.transactionId}`
+      })
+
+      // send Email to Host
+      sendEmail(bookingData?.host?.email, {
+        subject: 'Your Room got Booked!',
+        message: `You've  successfully booked a room through Hotel-Booking-App. Transaction Id: ${bookingData.guest.name}`
+      })
+
       res.send(result);
     });
 
@@ -233,16 +252,16 @@ async function run() {
     });
 
     // Update room data
-    app.put('/room/update/:id', verifyToken, verifyHost, async (req, res) => {
-      const id = req.params.id
-      const roomData = req.body
-      const query = { _id: new ObjectId(id)}
+    app.put("/room/update/:id", verifyToken, verifyHost, async (req, res) => {
+      const id = req.params.id;
+      const roomData = req.body;
+      const query = { _id: new ObjectId(id) };
       const updateDoc = {
-         $set: roomData, 
-      }
-      const result = await roomsCollection.updateOne(query, updateDoc)
-      res.send(result)
-    })
+        $set: roomData,
+      };
+      const result = await roomsCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
 
     // get all booling for a guest depend on a guest email
     app.get("/my-bookings/:email", verifyToken, async (req, res) => {
@@ -321,34 +340,35 @@ async function run() {
       const totalRooms = await roomsCollection.countDocuments();
       // calculet totoalPrice
       const totalSales = bookingDetails.reduce(
-        (sum, booking) => sum + booking?.price, 0
+        (sum, booking) => sum + booking?.price,
+        0
       );
       // data chart create
-      const chartData = bookingDetails.map(booking => {
-        const day = new Date(booking?.date).getDate()
-        const month = new Date(booking?.date).getMonth() + 1
-        const data =  [`${day}/${month}`, booking?.price]
-        return data
-      })
-      chartData.unshift(['Day', 'Sales'])
-     
+      const chartData = bookingDetails.map((booking) => {
+        const day = new Date(booking?.date).getDate();
+        const month = new Date(booking?.date).getMonth() + 1;
+        const data = [`${day}/${month}`, booking?.price];
+        return data;
+      });
+      chartData.unshift(["Day", "Sales"]);
+
       res.send({
         totalUser,
         totalRooms,
         totalBookings: bookingDetails.length,
         totalSales,
-        chartData
+        chartData,
       });
     });
 
-    // Host statistics 
+    // Host statistics
     app.get("/host-stat", verifyToken, verifyHost, async (req, res) => {
-      const { email } = req.user
+      const { email } = req.user;
 
       // get bookingDtail
       const bookingDetails = await bookingsCollection
         .find(
-          {'host.email': email},
+          { "host.email": email },
           {
             projection: {
               date: 1,
@@ -359,24 +379,30 @@ async function run() {
         .toArray();
 
       // get total rooms
-      const totalRooms = await roomsCollection.countDocuments({'host.email': email});
+      const totalRooms = await roomsCollection.countDocuments({
+        "host.email": email,
+      });
       // calculet totoalPrice
       const totalSales = bookingDetails.reduce(
-        (sum, booking) => sum + booking?.price, 0
+        (sum, booking) => sum + booking?.price,
+        0
       );
 
       // Only host timestamp get UsersColection
-      const { timestamp } = await usersCollection.findOne({email}, { projection: {timestamp: 1}} )
+      const { timestamp } = await usersCollection.findOne(
+        { email },
+        { projection: { timestamp: 1 } }
+      );
 
       // data chart create
-      const chartData = bookingDetails.map(booking => {
-        const day = new Date(booking?.date).getDate()
-        const month = new Date(booking?.date).getMonth() + 1
-        const data =  [`${day}/${month}`, booking?.price]
-        return data
-      })
-      chartData.unshift(['Day', 'Sales'])
-     
+      const chartData = bookingDetails.map((booking) => {
+        const day = new Date(booking?.date).getDate();
+        const month = new Date(booking?.date).getMonth() + 1;
+        const data = [`${day}/${month}`, booking?.price];
+        return data;
+      });
+      chartData.unshift(["Day", "Sales"]);
+
       res.send({
         totalRooms,
         totalBookings: bookingDetails.length,
@@ -386,14 +412,14 @@ async function run() {
       });
     });
 
-    // Guest Statistics 
+    // Guest Statistics
     app.get("/guest-stat", verifyToken, async (req, res) => {
-      const { email } = req.user
+      const { email } = req.user;
 
       // get bookingDtail
       const bookingDetails = await bookingsCollection
         .find(
-          {'guest.email': email},
+          { "guest.email": email },
           {
             projection: {
               date: 1,
@@ -405,21 +431,25 @@ async function run() {
 
       // calculet totalSpan
       const totalSpan = bookingDetails.reduce(
-        (sum, booking) => sum + booking?.price, 0
+        (sum, booking) => sum + booking?.price,
+        0
       );
 
       // Only guest timestamp get UsersColection
-      const { timestamp } = await usersCollection.findOne({email}, { projection: {timestamp: 1}} )
+      const { timestamp } = await usersCollection.findOne(
+        { email },
+        { projection: { timestamp: 1 } }
+      );
 
       // data chart create
-      const chartData = bookingDetails.map(booking => {
-        const day = new Date(booking?.date).getDate()
-        const month = new Date(booking?.date).getMonth() + 1
-        const data =  [`${day}/${month}`, booking?.price]
-        return data
-      })
-      chartData.unshift(['Day', 'Span'])
-     
+      const chartData = bookingDetails.map((booking) => {
+        const day = new Date(booking?.date).getDate();
+        const month = new Date(booking?.date).getMonth() + 1;
+        const data = [`${day}/${month}`, booking?.price];
+        return data;
+      });
+      chartData.unshift(["Day", "Span"]);
+
       res.send({
         totalBookings: bookingDetails.length,
         guestSince: timestamp,
@@ -427,6 +457,44 @@ async function run() {
         chartData,
       });
     });
+
+    // Send email
+    const sendEmail = (emailAddress, emalData) => {
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false, // true for port 465, false for other ports
+        auth: {
+          user: process.env.TRANSPORTER_EMAIL,
+          pass: process.env.TRANSPORTER_PASS,
+        },
+      });
+
+      // verify connection configuration
+      transporter.verify(function (error, success) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log("Server is ready to take our messages");
+        }
+      });
+
+      const mailBody = {
+        from: `"Hotel-Booking-App" <${process.env.TRANSPORTER_EMAIL}>`, // sender address
+        to: emailAddress, // list of receivers
+        subject: emalData.subject, // Subject line
+        html: emalData.message, // html body
+      };
+
+      transporter.sendMail(mailBody, (error, info) => {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log("Email Sent:" + info.response);
+        }
+      });
+    };
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
